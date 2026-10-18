@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { localePath, otherLocale, segments, useUi, type Locale } from '../i18n';
+import { getPosts, getTags } from '../lib/posts';
+
+const { locale, tag } = Astro.props as { locale: Locale; tag: string };
+const ui = useUi(locale);
+const label = ui.tags[tag as keyof typeof ui.tags] as string;
+const posts = (await getPosts(locale)).filter((post) => post.data.tags.includes(tag as never));
+// The equivalent tag page exists only if the other language uses that tag.
+const other = otherLocale(locale);
+const hasOther = (await getTags(other)).some((entry) => entry.tag === tag);
+const alternates = {
+  [locale]: localePath(locale, segments.tags[locale], tag),
+  ...(hasOther ? { [other]: localePath(other, segments.tags[other], tag) } : {}),
+};
+---
+<BaseLayout locale={locale} title={ui.tags.postsTagged(label)} description={ui.tags.postsTagged(label)} alternates={alternates}>
+  <h1>{ui.tags.postsTagged(label)}</h1>
+  <div class="post-list">
+    {posts.map((post) => <PostCard post={post} locale={locale} />)}
+  </div>
+  <p><a href={localePath(locale, segments.blog[locale])}>{ui.post.back}</a></p>
+</BaseLayout>

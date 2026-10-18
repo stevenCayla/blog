@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localePath, segments, useUi, type Locale } from '../i18n';
+
+const { locale } = Astro.props as { locale: Locale };
+const ui = useUi(locale);
+---
+<BaseLayout
+  locale={locale}
+  title={ui.about.title}
+  description={ui.about.description}
+  alternates={{ fr: localePath('fr', segments.about.fr), en: localePath('en', segments.about.en) }}
+>
+  <h1>{ui.about.title}</h1>
+  {locale === 'fr' ? (
+    <div class="prose">
+      <p>Je suis Steven, ingénieur développement senior. Cette page est un emplacement : la biographie viendra ici.</p>
+      <p>J'écris sur l'intelligence artificielle, la programmation et, de temps en temps, sur la vie.</p>
+    </div>
+  ) : (
+    <div class="prose">
+      <p>I am Steven, a senior development engineer. This page is a placeholder: the biography will go here.</p>
+      <p>I write about artificial intelligence, programming and, from time to time, about life.</p>
+    </div>
+  )}
+</BaseLayout>

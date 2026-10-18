@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { localePath, segments, useUi, type Locale } from '../i18n';
+import { getPosts, getTags } from '../lib/posts';
+
+const { locale } = Astro.props as { locale: Locale };
+const ui = useUi(locale);
+const posts = await getPosts(locale);
+const tags = await getTags(locale);
+---
+<BaseLayout
+  locale={locale}
+  title={ui.blog.title}
+  description={ui.blog.description}
+  alternates={{ fr: localePath('fr', segments.blog.fr), en: localePath('en', segments.blog.en) }}
+>
+  <h1>{ui.blog.title}</h1>
+
+  <div class="tag-filter" role="group" aria-label={ui.blog.filter} data-tag-filter>
+    <button type="button" data-tag="" aria-pressed="true">{ui.blog.all}</button>
+    {tags.map(({ tag }) => (
+      <button type="button" data-tag={tag} aria-pressed="false">{ui.tags[tag as keyof typeof ui.tags] as string}</button>
+    ))}
+  </div>
+
+  {posts.length === 0 && <p>{ui.blog.empty}</p>}
+  <div class="post-list" data-post-list>
+    {posts.map((post) => <PostCard post={post} locale={locale} />)}
+  </div>
+</BaseLayout>
+
+<script>
+  const group = document.querySelector<HTMLElement>('[data-tag-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-post-list] .post-card');
+  group?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-tag]');
+    if (!button) return;
+    const tag = button.dataset.tag ?? '';
+    group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+    cards.forEach((card) => {
+      card.hidden = tag !== '' && !(card.dataset.tags ?? '').split(' ').includes(tag);
+    });
+  });
+</script>

@@ -1,0 +1,19 @@
+---
+import { formatDate, localePath, segments, useUi, type Locale } from '../i18n';
+import { postPath, readingTime, type Post } from '../lib/posts';
+const { post, locale } = Astro.props as { post: Post; locale: Locale };
+const ui = useUi(locale);
+---
+<article class="post-card" data-tags={post.data.tags.join(' ')}>
+  <h3><a href={postPath(post)}>{post.data.title}</a></h3>
+  <p class="meta">
+    <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, locale)}</time>
+    · {ui.post.readingTime(readingTime(post.body))}
+  </p>
+  <p>{post.data.description}</p>
+  <ul class="tags">
+    {post.data.tags.map((tag) => (
+      <li><a href={localePath(locale, segments.tags[locale], tag)}>{ui.tags[tag]}</a></li>
+    ))}
+  </ul>
+</article>

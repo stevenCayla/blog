@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localePath, useUi, type Locale } from '../i18n';
+
+const { locale } = Astro.props as { locale: Locale };
+const ui = useUi(locale);
+---
+<BaseLayout
+  locale={locale}
+  title={ui.notFound.title}
+  description={ui.notFound.text}
+  alternates={{ [locale]: Astro.url.pathname }}
+  noindex
+>
+  <h1>{ui.notFound.title}</h1>
+  <p>{ui.notFound.text}</p>
+  <p><a href={localePath(locale, '')}>{ui.notFound.home}</a></p>
+</BaseLayout>
