@@ -1,0 +1,23 @@
+---
+import { locales, useUi, type Locale } from '../i18n';
+interface Props {
+  locale: Locale;
+  /** Equivalent page per language; falls back to the home page of that language. */
+  alternates: Partial<Record<Locale, string>>;
+  homes: Record<Locale, string>;
+}
+const { locale, alternates, homes } = Astro.props;
+const ui = useUi(locale);
+---
+<nav class="lang-switcher" aria-label={ui.language.label}>
+  {locales.map((code) => (
+    <a
+      href={alternates[code] ?? homes[code]}
+      hreflang={code}
+      lang={code}
+      aria-current={code === locale ? 'true' : undefined}
+    >
+      {code.toUpperCase()}
+    </a>
+  ))}
+</nav>

@@ -1,0 +1,20 @@
+---
+import NotFound from '../page-components/NotFound.astro';
+---
+<!-- Cloudflare Pages serves this file for every unknown URL, including /en/...:
+     the script below swaps to the English page when the path starts with /en/. -->
+<NotFound locale="fr" />
+
+<script is:inline>
+  if (/^\/en(\/|$)/.test(location.pathname)) {
+    fetch('/en/404.html')
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        document.documentElement.lang = doc.documentElement.lang;
+        document.title = doc.title;
+        document.body.innerHTML = doc.body.innerHTML;
+      })
+      .catch(function () {});
+  }
+</script>

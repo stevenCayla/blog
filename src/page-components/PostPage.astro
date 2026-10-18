@@ -1,0 +1,44 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDate, localePath, segments, useUi } from '../i18n';
+import { getTranslation, postLocale, postPath, readingTime, type Post } from '../lib/posts';
+
+const { post } = Astro.props as { post: Post };
+const locale = postLocale(post);
+const ui = useUi(locale);
+const translation = await getTranslation(post);
+const alternates = translation
+  ? { [locale]: postPath(post), [postLocale(translation)]: postPath(translation) }
+  : { [locale]: postPath(post) };
+const { Content } = await render(post);
+---
+<BaseLayout
+  locale={locale}
+  title={post.data.title}
+  description={post.data.description}
+  alternates={alternates}
+  type="article"
+  pubDate={post.data.pubDate}
+>
+  <article>
+    <h1>{post.data.title}</h1>
+    <p class="meta">
+      {ui.post.published}
+      <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, locale)}</time>
+      · {ui.post.readingTime(readingTime(post.body))}
+    </p>
+    <ul class="tags">
+      {post.data.tags.map((tag) => (
+        <li><a href={localePath(locale, segments.tags[locale], tag)}>{ui.tags[tag]}</a></li>
+      ))}
+    </ul>
+    {translation && (
+      <p class="translation-link">
+        <a href={postPath(translation)} hreflang={postLocale(translation)}>{ui.post.translation}</a>
+      </p>
+    )}
+    <div class="prose"><Content /></div>
+  </article>
+  <p><a href={localePath(locale, segments.blog[locale])}>{ui.post.back}</a></p>
+</BaseLayout>
