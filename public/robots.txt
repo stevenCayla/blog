@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://steven.cayla-maschi.fr/sitemap-fr.xml
+Sitemap: https://steven.cayla-maschi.fr/sitemap-en.xml
